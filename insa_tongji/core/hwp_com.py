@@ -1,8 +1,11 @@
 import contextlib
+import io
 import os
 import queue
+import re
 import tempfile
 import threading
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,6 +117,29 @@ def convert_hwp_to_hwpx(data: bytes, timeout: float = CONVERT_TIMEOUT_SEC) -> by
     return value
 
 
+_IMG_BRUSH = re.compile(rb"<hc:imgBrush\b.*?</hc:imgBrush>", re.S)
+
+
+def strip_background_pictures(data: bytes) -> bytes:
+    """화면 보기용 사본에서 칸 배경 그림 채우기를 제거한다.
+
+    한컴 편집 화면은 이 배경 그림을 그리지 않지만 PDF 변환은 그린다(바깥 타원 링).
+    화면 보기를 한컴 편집 화면과 같게 하려는 것이며, 내려받는 HWPX는 바꾸지 않는다.
+    """
+    try:
+        src = zipfile.ZipFile(io.BytesIO(data))
+    except zipfile.BadZipFile:
+        return data
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as dst:
+        for info in src.infolist():
+            body = src.read(info.filename)
+            if info.filename == "Contents/header.xml":
+                body = _IMG_BRUSH.sub(b"", body)
+            dst.writestr(info, body, compress_type=info.compress_type)
+    return out.getvalue()
+
+
 class PdfRenderer:
     def __init__(self, idle_seconds: float = 90, timeout: float = 120):
         self.idle_seconds = idle_seconds
@@ -164,7 +190,7 @@ class PdfRenderer:
     def _to_pdf(hwp, data: bytes) -> bytes:
         with tempfile.TemporaryDirectory(prefix="insa_view_", ignore_cleanup_errors=True) as tmp:
             src, pdf = Path(tmp) / "doc.hwpx", Path(tmp) / "doc.pdf"
-            src.write_bytes(data)
+            src.write_bytes(strip_background_pictures(data))
             try:
                 if not _open(hwp, src, "HWPX"):
                     raise RuntimeError("한컴오피스에서 문서를 열지 못했습니다")

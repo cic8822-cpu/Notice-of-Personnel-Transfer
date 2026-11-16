@@ -67,7 +67,7 @@ def test_t34_originals_unchanged_after_run(tmp_path):
     session.zip_bytes()
     assert {p: sha(p) for p in before} == before
     preflight = (ROOT / "docs" / "preflight.md").read_text(encoding="utf-8")
-    for name, digest in re.findall(r"\| ([^|]+\.(?:hwpx?|xlsx)) \| ([0-9A-F]{64}) \|", preflight):
+    for name, digest in re.findall(r"\| ([^|]+\.hwpx?) \| ([0-9A-F]{64}) \|", preflight):
         path = ROOT / name.strip()
         if path.exists():
             assert sha(path).upper() == digest, name

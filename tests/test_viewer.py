@@ -226,3 +226,18 @@ def test_pdf_renderer_times_out_instead_of_hanging(monkeypatch):
     renderer = hwp_com.PdfRenderer(idle_seconds=0.2, timeout=0.3)
     with pytest.raises(RuntimeError, match="시간 초과"):
         renderer.render(b"x")
+
+
+def test_viewer_copy_drops_background_picture_fill_only():
+    import io
+    import zipfile
+
+    original = (ROOT / "templates" / "전보.hwpx").read_bytes()
+    stripped = hwp_com.strip_background_pictures(original)
+    before, after = zipfile.ZipFile(io.BytesIO(original)), zipfile.ZipFile(io.BytesIO(stripped))
+    assert b"imgBrush" in before.read("Contents/header.xml")
+    assert b"imgBrush" not in after.read("Contents/header.xml")
+    assert after.namelist() == before.namelist() and after.namelist()[0] == "mimetype"
+    for name in before.namelist():
+        if name != "Contents/header.xml":
+            assert after.read(name) == before.read(name), name

@@ -1,6 +1,6 @@
 [project]
 name = "insa-tongji"
-version = "1.0.2"
+version = "1.0.3"
 description = "교육공무직원 신규임용장·일반전보 인사발령통지서 HWPX 일괄 생성기"
 requires-python = ">=3.11"
 dependencies = ["openpyxl>=3.1", "lxml>=5"]
