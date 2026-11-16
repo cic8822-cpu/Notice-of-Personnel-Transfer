@@ -14,3 +14,4 @@ __pycache__/
 .pytest_cache/
 .claude/settings.local.json
 .claude/hooks/.gate_blocks
+/*.zip
