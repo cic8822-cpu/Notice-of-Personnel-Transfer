@@ -1,0 +1,15 @@
+﻿# 개인정보·실자료 (절대 커밋 금지)
+/real_data/
+/신규임명장/
+/*.xlsx
+/*.hwp
+/*.hwpx
+/*.jpg
+/docs/poc_evidence/
+# 빌드·캐시
+/dist/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+.claude/settings.local.json

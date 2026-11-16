@@ -1,0 +1,18 @@
+[project]
+name = "insa-tongji"
+version = "1.0.1"
+description = "교육공무직원 신규임용장·일반전보 인사발령통지서 HWPX 일괄 생성기"
+requires-python = ">=3.11"
+dependencies = ["openpyxl>=3.1", "lxml>=5"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not hancom'"
+markers = ["hancom: 한컴오피스가 설치된 PC에서만 실행(느림, 창 사용)"]

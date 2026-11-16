@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./real_data/**)",
+      "Read(./신규임명장/**)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/hooks/quality_gate.py\"",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  }
+}
